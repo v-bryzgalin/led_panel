@@ -1,0 +1,178 @@
+--------------------------------------------------------------------------------
+-- Copyright (c) 1995-2003 Xilinx, Inc.
+-- All Right Reserved.
+--------------------------------------------------------------------------------
+--   ____  ____ 
+--  /   /\/   / 
+-- /___/  \  /    Vendor: Xilinx 
+-- \   \   \/     Version : 10.1
+--  \   \         Application : ISE
+--  /   /         Filename : Panel_16x16_testwave.ant
+-- /___/   /\     Timestamp : Tue Apr 02 21:47:27 2013
+-- \   \  /  \ 
+--  \___\/\___\ 
+--
+--Command: 
+--Design Name: Panel_16x16_testwave
+--Device: Xilinx
+--
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+USE IEEE.STD_LOGIC_TEXTIO.ALL;
+USE STD.TEXTIO.ALL;
+
+ENTITY Panel_16x16_testwave IS
+END Panel_16x16_testwave;
+
+ARCHITECTURE testbench_arch OF Panel_16x16_testwave IS
+    FILE RESULTS: TEXT OPEN WRITE_MODE IS "D:\STUDY\Diplom_LED_project\Diplom_LED\Panel_16x16_testwave.ano";
+
+    COMPONENT Panel_16x16
+        PORT (
+            CLK : In std_logic;
+            WR : In std_logic;
+            Addr_Bus_Write : In std_logic_vector (7 DownTo 0);
+            Data_Bus_IN_Mem : In std_logic_vector (23 DownTo 0);
+            RGB_string : Out std_logic_vector (47 DownTo 0);
+            Enable_str : Out std_logic_vector (15 DownTo 0)
+        );
+    END COMPONENT;
+
+    SIGNAL CLK : std_logic := '0';
+    SIGNAL WR : std_logic := '0';
+    SIGNAL Addr_Bus_Write : std_logic_vector (7 DownTo 0) := "00000000";
+    SIGNAL Data_Bus_IN_Mem : std_logic_vector (23 DownTo 0) := "000000000000000000000000";
+    SIGNAL RGB_string : std_logic_vector (47 DownTo 0) := "000000000000000000000000000000000000000000000000";
+    SIGNAL Enable_str : std_logic_vector (15 DownTo 0) := "0000000000000000";
+
+    SHARED VARIABLE TX_ERROR : INTEGER := 0;
+    SHARED VARIABLE TX_OUT : LINE;
+
+    constant PERIOD : time := 200 ns;
+    constant DUTY_CYCLE : real := 0.5;
+    constant OFFSET : time := 100 ns;
+
+    BEGIN
+        UUT : Panel_16x16
+        PORT MAP (
+            CLK => CLK,
+            WR => WR,
+            Addr_Bus_Write => Addr_Bus_Write,
+            Data_Bus_IN_Mem => Data_Bus_IN_Mem,
+            RGB_string => RGB_string,
+            Enable_str => Enable_str
+        );
+
+        PROCESS    -- clock process for CLK
+        BEGIN
+            WAIT for OFFSET;
+            CLOCK_LOOP : LOOP
+                CLK <= '0';
+                WAIT FOR (PERIOD - (PERIOD * DUTY_CYCLE));
+                CLK <= '1';
+                WAIT FOR (PERIOD * DUTY_CYCLE);
+            END LOOP CLOCK_LOOP;
+        END PROCESS;
+
+        PROCESS    -- Annotation process for CLK
+            VARIABLE TX_TIME : INTEGER := 0;
+
+            PROCEDURE ANNOTATE_RGB_string(
+                TX_TIME : INTEGER
+            ) IS
+                VARIABLE TX_STR : String(1 to 4096);
+                VARIABLE TX_LOC : LINE;
+            BEGIN
+                STD.TEXTIO.write(TX_LOC, string'("Annotate["));
+                STD.TEXTIO.write(TX_LOC, TX_TIME);
+                STD.TEXTIO.write(TX_LOC, string'(", RGB_string, "));
+                IEEE.STD_LOGIC_TEXTIO.write(TX_LOC, RGB_string);
+                STD.TEXTIO.write(TX_LOC, string'("]"));
+                TX_STR(TX_LOC.all'range) := TX_LOC.all;
+                STD.TEXTIO.writeline(RESULTS, TX_LOC);
+                STD.TEXTIO.Deallocate(TX_LOC);
+            END;
+            PROCEDURE ANNOTATE_Enable_str(
+                TX_TIME : INTEGER
+            ) IS
+                VARIABLE TX_STR : String(1 to 4096);
+                VARIABLE TX_LOC : LINE;
+            BEGIN
+                STD.TEXTIO.write(TX_LOC, string'("Annotate["));
+                STD.TEXTIO.write(TX_LOC, TX_TIME);
+                STD.TEXTIO.write(TX_LOC, string'(", Enable_str, "));
+                IEEE.STD_LOGIC_TEXTIO.write(TX_LOC, Enable_str);
+                STD.TEXTIO.write(TX_LOC, string'("]"));
+                TX_STR(TX_LOC.all'range) := TX_LOC.all;
+                STD.TEXTIO.writeline(RESULTS, TX_LOC);
+                STD.TEXTIO.Deallocate(TX_LOC);
+            END;
+        BEGIN
+            WAIT for 1 fs;
+            ANNOTATE_RGB_string(0);
+            ANNOTATE_Enable_str(0);
+            WAIT for OFFSET;
+            TX_TIME := TX_TIME + 100;
+            ANNO_LOOP : LOOP
+                --Rising Edge
+                WAIT for 115 ns;
+                TX_TIME := TX_TIME + 115;
+                ANNOTATE_RGB_string(TX_TIME);
+                ANNOTATE_Enable_str(TX_TIME);
+                WAIT for 85 ns;
+                TX_TIME := TX_TIME + 85;
+            END LOOP ANNO_LOOP;
+        END PROCESS;
+
+        PROCESS
+            BEGIN
+                -- -------------  Current Time:  185ns
+                WAIT FOR 185 ns;
+                Addr_Bus_Write <= "00010001";
+                Data_Bus_IN_Mem <= "001001111101010010101100";
+                -- -------------------------------------
+                -- -------------  Current Time:  1785ns
+                WAIT FOR 1600 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  12185ns
+                WAIT FOR 10400 ns;
+                WR <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  18385ns
+                WAIT FOR 6200 ns;
+                Addr_Bus_Write <= "00010010";
+                Data_Bus_IN_Mem <= "101001010010010001100010";
+                -- -------------------------------------
+                -- -------------  Current Time:  23185ns
+                WAIT FOR 4800 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  31985ns
+                WAIT FOR 8800 ns;
+                WR <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  69585ns
+                WAIT FOR 37600 ns;
+                Addr_Bus_Write <= "00010011";
+                Data_Bus_IN_Mem <= "010110001000011000110101";
+                -- -------------------------------------
+                -- -------------  Current Time:  96385ns
+                WAIT FOR 26800 ns;
+                Addr_Bus_Write <= "00010100";
+                Data_Bus_IN_Mem <= "011101101001000000010100";
+                -- -------------------------------------
+                WAIT FOR 1.00382e+006 ns;
+
+                STD.TEXTIO.write(TX_OUT, string'("Total[]"));
+                STD.TEXTIO.writeline(RESULTS, TX_OUT);
+                ASSERT (FALSE) REPORT
+                    "Success! Simulation for annotation completed"
+                    SEVERITY FAILURE;
+            END PROCESS;
+
+    END testbench_arch;
+

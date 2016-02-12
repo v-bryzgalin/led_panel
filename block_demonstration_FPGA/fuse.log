@@ -1,0 +1,95 @@
+Determining compilation order of HDL files
+Analyzing VHDL file RG_8_bit.vhd
+Restoring VHDL parse-tree ieee.std_logic_1164 from
+c:/xilinx/10.1/ise/vhdl/hdp/nt/ieee/std_logic_1164.vdb
+Restoring VHDL parse-tree std.standard from
+c:/xilinx/10.1/ise/vhdl/hdp/nt/std/standard.vdb
+Restoring VHDL parse-tree ieee.std_logic_arith from
+c:/xilinx/10.1/ise/vhdl/hdp/nt/ieee/std_logic_arith.vdb
+Restoring VHDL parse-tree ieee.std_logic_unsigned from
+c:/xilinx/10.1/ise/vhdl/hdp/nt/ieee/std_logic_unsigned.vdb
+Analyzing VHDL file Counter_8_bit.vhd
+Analyzing VHDL file Comparator_8_bit.vhd
+Analyzing VHDL file Pixel_of_string.vhd
+Analyzing VHDL file DC_Addr_4_to_16.vhd
+Analyzing VHDL file Buffer_24_bit.vhd
+Analyzing VHDL file AND_DC_Addr_WR.vhd
+Analyzing VHDL file One_string.vhd
+Analyzing VHDL file Memory_256x24.vhd
+Analyzing VHDL file Counter_DC_str.vhd
+Analyzing VHDL file SPI_connection.vhd
+Analyzing VHDL file Panel_16x16.vhd
+Analyzing VHDL file Counter_decr.vhd
+Analyzing VHDL file USP.vhd
+Analyzing VHDL file USP_testwave.vhw
+Restoring VHDL parse-tree ieee.std_logic_textio from
+c:/xilinx/10.1/ise/vhdl/hdp/nt/ieee/std_logic_textio.vdb
+Restoring VHDL parse-tree std.textio from
+c:/xilinx/10.1/ise/vhdl/hdp/nt/std/textio.vdb
+Saving VHDL parse-tree work.rg_8_bit into
+d:/study/diplom_led_project/diplom_led/isim/work/rg_8_bit.vdb
+Saving VHDL parse-tree work.counter_8_bit into
+d:/study/diplom_led_project/diplom_led/isim/work/counter_8_bit.vdb
+Saving VHDL parse-tree work.comparator_8_bit into
+d:/study/diplom_led_project/diplom_led/isim/work/comparator_8_bit.vdb
+Saving VHDL parse-tree work.pixel_of_string into
+d:/study/diplom_led_project/diplom_led/isim/work/pixel_of_string.vdb
+Saving VHDL parse-tree work.dc_addr into
+d:/study/diplom_led_project/diplom_led/isim/work/dc_addr.vdb
+Saving VHDL parse-tree work.buffer_24_bit into
+d:/study/diplom_led_project/diplom_led/isim/work/buffer_24_bit.vdb
+Saving VHDL parse-tree work.and_dc_addr_wr into
+d:/study/diplom_led_project/diplom_led/isim/work/and_dc_addr_wr.vdb
+Saving VHDL parse-tree work.one_string into
+d:/study/diplom_led_project/diplom_led/isim/work/one_string.vdb
+Saving VHDL parse-tree work.memory_256x24 into
+d:/study/diplom_led_project/diplom_led/isim/work/memory_256x24.vdb
+Saving VHDL parse-tree work.counter_dc_str into
+d:/study/diplom_led_project/diplom_led/isim/work/counter_dc_str.vdb
+Saving VHDL parse-tree work.spi_connection into
+d:/study/diplom_led_project/diplom_led/isim/work/spi_connection.vdb
+Saving VHDL parse-tree work.panel_16x16 into
+d:/study/diplom_led_project/diplom_led/isim/work/panel_16x16.vdb
+Saving VHDL parse-tree work.counter_decr into
+d:/study/diplom_led_project/diplom_led/isim/work/counter_decr.vdb
+Saving VHDL parse-tree work.usp into
+d:/study/diplom_led_project/diplom_led/isim/work/usp.vdb
+Saving VHDL parse-tree work.usp_testwave into
+d:/study/diplom_led_project/diplom_led/isim/work/usp_testwave.vdb
+Starting static elaboration
+Completed static elaboration
+Fuse Memory Usage: 57496 Kb
+Fuse CPU Usage: 811 ms
+Using precompiled package standard from library std
+Using precompiled package std_logic_1164 from library ieee
+Using precompiled package std_logic_arith from library ieee
+Using precompiled package std_logic_unsigned from library ieee
+Using precompiled package textio from library std
+Using precompiled package std_logic_textio from library ieee
+Compiling architecture behavioral of entity spi_connection
+[spi_connection_default]
+Compiling architecture behavioral of entity counter_dc_str
+[counter_dc_str_default]
+Compiling architecture behavioral of entity memory_256x24
+[memory_256x24_default]
+Compiling architecture behavioral of entity dc_addr [dc_addr_default]
+Compiling architecture behavioral of entity buffer_24_bit
+[buffer_24_bit_default]
+Compiling architecture behavioral of entity and_dc_addr_wr
+[and_dc_addr_wr_default]
+Compiling architecture behavioral of entity rg_8_bit [rg_8_bit_default]
+Compiling architecture behavioral of entity counter_8_bit
+[counter_8_bit_default]
+Compiling architecture behavioral of entity comparator_8_bit
+[comparator_8_bit_default]
+Compiling architecture structural of entity pixel_of_string
+[pixel_of_string_default]
+Compiling architecture structural of entity one_string [one_string_default]
+Compiling architecture structural of entity panel_16x16 [panel_16x16_default]
+Compiling architecture behavioral of entity counter_decr [counter_decr_default]
+Compiling architecture structural of entity usp [usp_default]
+Compiling architecture testbench_arch of entity usp_testwave
+Compiled 35 VHDL Units
+Built simulation executable USP_testwave_isim_beh.exe
+Fuse Memory Usage: 58780 Kb
+Fuse CPU Usage: 968 ms

@@ -1,0 +1,3 @@
+MODULE Counter_DC_str_testwave
+SUBMODULE Counter_DC_str
+INSTANCE UUT

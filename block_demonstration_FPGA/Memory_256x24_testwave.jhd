@@ -1,0 +1,3 @@
+MODULE Memory_256x24_testwave
+SUBMODULE Memory_256x24
+INSTANCE UUT

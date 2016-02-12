@@ -1,0 +1,3 @@
+MODULE Panel_16x16_testwave
+SUBMODULE Panel_16x16
+INSTANCE UUT

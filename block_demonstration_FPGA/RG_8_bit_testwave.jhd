@@ -1,0 +1,3 @@
+MODULE RG_8_bit_testwave
+SUBMODULE RG_8_bit
+INSTANCE UUT

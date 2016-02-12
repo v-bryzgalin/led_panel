@@ -1,0 +1,3 @@
+MODULE counter_decr_testwave
+SUBMODULE Counter_decr
+INSTANCE UUT

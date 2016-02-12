@@ -1,0 +1,43 @@
+Command line:
+   ./USP_testwave_isim_beh.exe
+     -intstyle  ise
+     -ipchost  localhost
+     -ipcport  1053
+
+Mon Apr 08 14:48:42 2013
+
+Total Line Count : 6391
+
+ Elaboration Time: 0.265625 sec
+
+ Current Memory Usage: 160.457 Meg
+
+ Total Signals          : 10177
+ Total Nets             : 12071
+ Total Signal Drivers   : 2386
+ Total Blocks           : 2396
+ Total Primitive Blocks : 2116
+ Total Processes        : 2382
+ Total Traceable Variables  : 19
+ Total Scalar Nets and Variables : 12976
+ntrace select -o on -n /usp_testwave/clk 
+ntrace select -o on -n /usp_testwave/mosi 
+ntrace select -o on -n /usp_testwave/sclk 
+ntrace select -o on -n /usp_testwave/cs 
+ntrace select -o on -n /usp_testwave/UUT/SPI/wr_panel 
+ntrace select -o on -n /usp_testwave/addrbus 
+ntrace select -o on -n /usp_testwave/vkl_str 
+ntrace select -o on -n /usp_testwave/rgb 
+ntrace select -o on -n /usp_testwave/UUT/Panel/addr_bus_read 
+ntrace select -o on -n /usp_testwave/UUT/Panel/wr_enable 
+ntrace start 
+isimrun 1000 ns 
+Simulator is doing circuit initialization process.
+Finished circuit initialization process.
+
+ Total Simulation Time: 0.625 sec
+
+ Current Memory Usage: 169.894 Meg
+
+Mon Apr 08 15:17:57 2013
+

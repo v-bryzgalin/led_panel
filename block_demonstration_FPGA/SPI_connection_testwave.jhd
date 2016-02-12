@@ -1,0 +1,3 @@
+MODULE SPI_connection_testwave
+SUBMODULE SPI_connection
+INSTANCE UUT

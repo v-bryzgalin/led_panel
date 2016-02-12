@@ -1,0 +1,256 @@
+--------------------------------------------------------------------------------
+-- Copyright (c) 1995-2003 Xilinx, Inc.
+-- All Right Reserved.
+--------------------------------------------------------------------------------
+--   ____  ____ 
+--  /   /\/   / 
+-- /___/  \  /    Vendor: Xilinx 
+-- \   \   \/     Version : 10.1
+--  \   \         Application : ISE
+--  /   /         Filename : SPI_connection_testwave.ant
+-- /___/   /\     Timestamp : Sun Mar 31 11:37:36 2013
+-- \   \  /  \ 
+--  \___\/\___\ 
+--
+--Command: 
+--Design Name: SPI_connection_testwave
+--Device: Xilinx
+--
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+USE IEEE.STD_LOGIC_TEXTIO.ALL;
+USE STD.TEXTIO.ALL;
+
+ENTITY SPI_connection_testwave IS
+END SPI_connection_testwave;
+
+ARCHITECTURE testbench_arch OF SPI_connection_testwave IS
+    FILE RESULTS: TEXT OPEN WRITE_MODE IS "D:\STUDY\Diplom_LED_project\Diplom_LED\SPI_connection_testwave.ano";
+
+    COMPONENT SPI_connection
+        PORT (
+            CLK : In std_logic;
+            SPI_MOSI : In std_logic;
+            SPI_SCLK : In std_logic;
+            SPI_CS : In std_logic;
+            WR_panel : Out std_logic;
+            DataBus : Out std_logic_vector (23 DownTo 0)
+        );
+    END COMPONENT;
+
+    SIGNAL CLK : std_logic := '0';
+    SIGNAL SPI_MOSI : std_logic := '0';
+    SIGNAL SPI_SCLK : std_logic := '0';
+    SIGNAL SPI_CS : std_logic := '0';
+    SIGNAL WR_panel : std_logic := '0';
+    SIGNAL DataBus : std_logic_vector (23 DownTo 0) := "000000000000000000000000";
+
+    SHARED VARIABLE TX_ERROR : INTEGER := 0;
+    SHARED VARIABLE TX_OUT : LINE;
+
+    constant PERIOD_CLK : time := 200 ns;
+    constant DUTY_CYCLE_CLK : real := 0.5;
+    constant OFFSET_CLK : time := 100 ns;
+    constant PERIOD_SPI_SCLK : time := 2000 ns;
+    constant DUTY_CYCLE_SPI_SCLK : real := 0.5;
+    constant OFFSET_SPI_SCLK : time := 100 ns;
+
+    BEGIN
+        UUT : SPI_connection
+        PORT MAP (
+            CLK => CLK,
+            SPI_MOSI => SPI_MOSI,
+            SPI_SCLK => SPI_SCLK,
+            SPI_CS => SPI_CS,
+            WR_panel => WR_panel,
+            DataBus => DataBus
+        );
+
+        PROCESS    -- clock process for CLK
+        BEGIN
+            WAIT for OFFSET_CLK;
+            CLOCK_LOOP : LOOP
+                CLK <= '0';
+                WAIT FOR (PERIOD_CLK - (PERIOD_CLK * DUTY_CYCLE_CLK));
+                CLK <= '1';
+                WAIT FOR (PERIOD_CLK * DUTY_CYCLE_CLK);
+            END LOOP CLOCK_LOOP;
+        END PROCESS;
+
+        PROCESS    -- clock process for SPI_SCLK
+        BEGIN
+            WAIT for OFFSET_SPI_SCLK;
+            CLOCK_LOOP : LOOP
+                SPI_SCLK <= '0';
+                WAIT FOR (PERIOD_SPI_SCLK - (PERIOD_SPI_SCLK * DUTY_CYCLE_SPI_SCLK));
+                SPI_SCLK <= '1';
+                WAIT FOR (PERIOD_SPI_SCLK * DUTY_CYCLE_SPI_SCLK);
+            END LOOP CLOCK_LOOP;
+        END PROCESS;
+
+        PROCESS    -- Annotation process for CLK
+            VARIABLE TX_TIME : INTEGER := 0;
+
+            PROCEDURE ANNOTATE_DataBus(
+                TX_TIME : INTEGER
+            ) IS
+                VARIABLE TX_STR : String(1 to 4096);
+                VARIABLE TX_LOC : LINE;
+            BEGIN
+                STD.TEXTIO.write(TX_LOC, string'("Annotate["));
+                STD.TEXTIO.write(TX_LOC, TX_TIME);
+                STD.TEXTIO.write(TX_LOC, string'(", DataBus, "));
+                IEEE.STD_LOGIC_TEXTIO.write(TX_LOC, DataBus);
+                STD.TEXTIO.write(TX_LOC, string'("]"));
+                TX_STR(TX_LOC.all'range) := TX_LOC.all;
+                STD.TEXTIO.writeline(RESULTS, TX_LOC);
+                STD.TEXTIO.Deallocate(TX_LOC);
+            END;
+            PROCEDURE ANNOTATE_WR_panel(
+                TX_TIME : INTEGER
+            ) IS
+                VARIABLE TX_STR : String(1 to 4096);
+                VARIABLE TX_LOC : LINE;
+            BEGIN
+                STD.TEXTIO.write(TX_LOC, string'("Annotate["));
+                STD.TEXTIO.write(TX_LOC, TX_TIME);
+                STD.TEXTIO.write(TX_LOC, string'(", WR_panel, "));
+                IEEE.STD_LOGIC_TEXTIO.write(TX_LOC, WR_panel);
+                STD.TEXTIO.write(TX_LOC, string'("]"));
+                TX_STR(TX_LOC.all'range) := TX_LOC.all;
+                STD.TEXTIO.writeline(RESULTS, TX_LOC);
+                STD.TEXTIO.Deallocate(TX_LOC);
+            END;
+        BEGIN
+            WAIT for 1 fs;
+            ANNOTATE_DataBus(0);
+            ANNOTATE_WR_panel(0);
+            WAIT for OFFSET_CLK;
+            TX_TIME := TX_TIME + 100;
+            ANNO_LOOP : LOOP
+                --Rising Edge
+                WAIT for 115 ns;
+                TX_TIME := TX_TIME + 115;
+                ANNOTATE_DataBus(TX_TIME);
+                ANNOTATE_WR_panel(TX_TIME);
+                WAIT for 85 ns;
+                TX_TIME := TX_TIME + 85;
+            END LOOP ANNO_LOOP;
+        END PROCESS;
+
+        PROCESS    -- Process for CLK
+            BEGIN
+                -- -------------  Current Time:  785ns
+                WAIT FOR 785 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  3985ns
+                WAIT FOR 3200 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  7185ns
+                WAIT FOR 3200 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  7985ns
+                WAIT FOR 800 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  9585ns
+                WAIT FOR 1600 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  11385ns
+                WAIT FOR 1800 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  15585ns
+                WAIT FOR 4200 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  19585ns
+                WAIT FOR 4000 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  21785ns
+                WAIT FOR 2200 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  22385ns
+                WAIT FOR 600 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  29385ns
+                WAIT FOR 7000 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  32585ns
+                WAIT FOR 3200 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  36585ns
+                WAIT FOR 4000 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  40585ns
+                WAIT FOR 4000 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  45185ns
+                WAIT FOR 4600 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  54185ns
+                WAIT FOR 9000 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  59185ns
+                WAIT FOR 5000 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  63985ns
+                WAIT FOR 4800 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  66985ns
+                WAIT FOR 3000 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  72585ns
+                WAIT FOR 5600 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  78585ns
+                WAIT FOR 6000 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  83785ns
+                WAIT FOR 5200 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  89785ns
+                WAIT FOR 6000 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  93385ns
+                WAIT FOR 3600 ns;
+                SPI_MOSI <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  97385ns
+                WAIT FOR 4000 ns;
+                SPI_MOSI <= '1';
+                -- -------------------------------------
+                WAIT FOR 4615 ns;
+
+                STD.TEXTIO.write(TX_OUT, string'("Total[]"));
+                STD.TEXTIO.writeline(RESULTS, TX_OUT);
+                ASSERT (FALSE) REPORT
+                    "Success! Simulation for annotation completed"
+                    SEVERITY FAILURE;
+            END PROCESS;
+
+    END testbench_arch;
+

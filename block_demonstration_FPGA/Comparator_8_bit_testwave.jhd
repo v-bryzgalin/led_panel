@@ -1,0 +1,3 @@
+MODULE Comparator_8_bit_testwave
+SUBMODULE Comparator_8_bit
+INSTANCE UUT

@@ -1,0 +1,119 @@
+--------------------------------------------------------------------------------
+-- Copyright (c) 1995-2003 Xilinx, Inc.
+-- All Right Reserved.
+--------------------------------------------------------------------------------
+--   ____  ____ 
+--  /   /\/   / 
+-- /___/  \  /    Vendor: Xilinx 
+-- \   \   \/     Version : 10.1
+--  \   \         Application : ISE
+--  /   /         Filename : RG_8_bit_testwave.ant
+-- /___/   /\     Timestamp : Wed Feb 27 12:06:02 2013
+-- \   \  /  \ 
+--  \___\/\___\ 
+--
+--Command: 
+--Design Name: RG_8_bit_testwave
+--Device: Xilinx
+--
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+USE IEEE.STD_LOGIC_TEXTIO.ALL;
+USE STD.TEXTIO.ALL;
+
+ENTITY RG_8_bit_testwave IS
+END RG_8_bit_testwave;
+
+ARCHITECTURE testbench_arch OF RG_8_bit_testwave IS
+    FILE RESULTS: TEXT OPEN WRITE_MODE IS "D:\STUDY\Diplom_LED_project\Diplom_LED\RG_8_bit_testwave.ano";
+
+    COMPONENT RG_8_bit
+        PORT (
+            Data_IN : In std_logic_vector (7 DownTo 0);
+            WR : In std_logic;
+            Data_OUT : Out std_logic_vector (7 DownTo 0)
+        );
+    END COMPONENT;
+
+    SIGNAL Data_IN : std_logic_vector (7 DownTo 0) := "00000000";
+    SIGNAL WR : std_logic := '0';
+    SIGNAL Data_OUT : std_logic_vector (7 DownTo 0) := "00000000";
+
+    SHARED VARIABLE TX_ERROR : INTEGER := 0;
+    SHARED VARIABLE TX_OUT : LINE;
+
+    BEGIN
+        UUT : RG_8_bit
+        PORT MAP (
+            Data_IN => Data_IN,
+            WR => WR,
+            Data_OUT => Data_OUT
+        );
+
+        PROCESS    -- Annotation process
+            VARIABLE TX_TIME : INTEGER := 0;
+
+            PROCEDURE ANNOTATE_Data_OUT(
+                TX_TIME : INTEGER
+            ) IS
+                VARIABLE TX_STR : String(1 to 4096);
+                VARIABLE TX_LOC : LINE;
+            BEGIN
+                STD.TEXTIO.write(TX_LOC, string'("Annotate["));
+                STD.TEXTIO.write(TX_LOC, TX_TIME);
+                STD.TEXTIO.write(TX_LOC, string'(", Data_OUT, "));
+                IEEE.STD_LOGIC_TEXTIO.write(TX_LOC, Data_OUT);
+                STD.TEXTIO.write(TX_LOC, string'("]"));
+                TX_STR(TX_LOC.all'range) := TX_LOC.all;
+                STD.TEXTIO.writeline(RESULTS, TX_LOC);
+                STD.TEXTIO.Deallocate(TX_LOC);
+            END;
+        BEGIN
+            WAIT for 1 fs;
+            ANNOTATE_Data_OUT(0);
+            ANNO_LOOP : LOOP
+                WAIT for 50 ns;
+                TX_TIME := TX_TIME + 50;
+                ANNOTATE_Data_OUT(TX_TIME);
+                WAIT for 50 ns;
+                TX_TIME := TX_TIME + 50;
+            END LOOP ANNO_LOOP;
+        END PROCESS;
+
+        PROCESS
+            BEGIN
+                -- -------------  Current Time:  100ns
+                WAIT FOR 100 ns;
+                Data_IN <= "01010101";
+                -- -------------------------------------
+                -- -------------  Current Time:  200ns
+                WAIT FOR 100 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  400ns
+                WAIT FOR 200 ns;
+                WR <= '0';
+                Data_IN <= "00010010";
+                -- -------------------------------------
+                -- -------------  Current Time:  600ns
+                WAIT FOR 200 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  800ns
+                WAIT FOR 200 ns;
+                WR <= '0';
+                -- -------------------------------------
+                WAIT FOR 200 ns;
+
+                STD.TEXTIO.write(TX_OUT, string'("Total[]"));
+                STD.TEXTIO.writeline(RESULTS, TX_OUT);
+                ASSERT (FALSE) REPORT
+                    "Success! Simulation for annotation completed"
+                    SEVERITY FAILURE;
+            END PROCESS;
+
+    END testbench_arch;
+

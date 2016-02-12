@@ -1,0 +1,3 @@
+MODULE One_string_testwave
+SUBMODULE One_string
+INSTANCE UUT

@@ -1,0 +1,3 @@
+MODULE Pixel_of_string_testwave
+SUBMODULE Pixel_of_string
+INSTANCE UUT

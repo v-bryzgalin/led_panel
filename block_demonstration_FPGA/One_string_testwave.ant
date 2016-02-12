@@ -1,0 +1,202 @@
+--------------------------------------------------------------------------------
+-- Copyright (c) 1995-2003 Xilinx, Inc.
+-- All Right Reserved.
+--------------------------------------------------------------------------------
+--   ____  ____ 
+--  /   /\/   / 
+-- /___/  \  /    Vendor: Xilinx 
+-- \   \   \/     Version : 10.1
+--  \   \         Application : ISE
+--  /   /         Filename : One_string_testwave.ant
+-- /___/   /\     Timestamp : Sat Mar 23 22:08:13 2013
+-- \   \  /  \ 
+--  \___\/\___\ 
+--
+--Command: 
+--Design Name: One_string_testwave
+--Device: Xilinx
+--
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+USE IEEE.STD_LOGIC_TEXTIO.ALL;
+USE STD.TEXTIO.ALL;
+
+ENTITY One_string_testwave IS
+END One_string_testwave;
+
+ARCHITECTURE testbench_arch OF One_string_testwave IS
+    FILE RESULTS: TEXT OPEN WRITE_MODE IS "D:\STUDY\Diplom_LED_project\Diplom_LED\One_string_testwave.ano";
+
+    COMPONENT One_string
+        PORT (
+            CLK : In std_logic;
+            Enable : In std_logic;
+            WR : In std_logic;
+            Addr_Bus : In std_logic_vector (3 DownTo 0);
+            Data_Bus : In std_logic_vector (23 DownTo 0);
+            RGB_string : Out std_logic_vector (47 DownTo 0)
+        );
+    END COMPONENT;
+
+    SIGNAL CLK : std_logic := '0';
+    SIGNAL Enable : std_logic := '0';
+    SIGNAL WR : std_logic := '0';
+    SIGNAL Addr_Bus : std_logic_vector (3 DownTo 0) := "0000";
+    SIGNAL Data_Bus : std_logic_vector (23 DownTo 0) := "000000000000000000000000";
+    SIGNAL RGB_string : std_logic_vector (47 DownTo 0) := "000000000000000000000000000000000000000000000000";
+
+    SHARED VARIABLE TX_ERROR : INTEGER := 0;
+    SHARED VARIABLE TX_OUT : LINE;
+
+    constant PERIOD : time := 100 ns;
+    constant DUTY_CYCLE : real := 0.5;
+    constant OFFSET : time := 100 ns;
+
+    BEGIN
+        UUT : One_string
+        PORT MAP (
+            CLK => CLK,
+            Enable => Enable,
+            WR => WR,
+            Addr_Bus => Addr_Bus,
+            Data_Bus => Data_Bus,
+            RGB_string => RGB_string
+        );
+
+        PROCESS    -- clock process for CLK
+        BEGIN
+            WAIT for OFFSET;
+            CLOCK_LOOP : LOOP
+                CLK <= '0';
+                WAIT FOR (PERIOD - (PERIOD * DUTY_CYCLE));
+                CLK <= '1';
+                WAIT FOR (PERIOD * DUTY_CYCLE);
+            END LOOP CLOCK_LOOP;
+        END PROCESS;
+
+        PROCESS    -- Annotation process for CLK
+            VARIABLE TX_TIME : INTEGER := 0;
+
+            PROCEDURE ANNOTATE_RGB_string(
+                TX_TIME : INTEGER
+            ) IS
+                VARIABLE TX_STR : String(1 to 4096);
+                VARIABLE TX_LOC : LINE;
+            BEGIN
+                STD.TEXTIO.write(TX_LOC, string'("Annotate["));
+                STD.TEXTIO.write(TX_LOC, TX_TIME);
+                STD.TEXTIO.write(TX_LOC, string'(", RGB_string, "));
+                IEEE.STD_LOGIC_TEXTIO.write(TX_LOC, RGB_string);
+                STD.TEXTIO.write(TX_LOC, string'("]"));
+                TX_STR(TX_LOC.all'range) := TX_LOC.all;
+                STD.TEXTIO.writeline(RESULTS, TX_LOC);
+                STD.TEXTIO.Deallocate(TX_LOC);
+            END;
+        BEGIN
+            WAIT for 1 fs;
+            ANNOTATE_RGB_string(0);
+            WAIT for OFFSET;
+            TX_TIME := TX_TIME + 100;
+            ANNO_LOOP : LOOP
+                --Rising Edge
+                WAIT for 65 ns;
+                TX_TIME := TX_TIME + 65;
+                ANNOTATE_RGB_string(TX_TIME);
+                WAIT for 35 ns;
+                TX_TIME := TX_TIME + 35;
+            END LOOP ANNO_LOOP;
+        END PROCESS;
+
+        PROCESS
+            BEGIN
+                -- -------------  Current Time:  1435ns
+                WAIT FOR 1435 ns;
+                Addr_Bus <= "1111";
+                Data_Bus <= "111111111000000001000000";
+                -- -------------------------------------
+                -- -------------  Current Time:  1635ns
+                WAIT FOR 200 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  6835ns
+                WAIT FOR 5200 ns;
+                WR <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  131135ns
+                WAIT FOR 124300 ns;
+                Data_Bus <= "100101010101010101101001";
+                -- -------------------------------------
+                -- -------------  Current Time:  135535ns
+                WAIT FOR 4400 ns;
+                Addr_Bus <= "1110";
+                -- -------------------------------------
+                -- -------------  Current Time:  146035ns
+                WAIT FOR 10500 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  156435ns
+                WAIT FOR 10400 ns;
+                WR <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  352935ns
+                WAIT FOR 196500 ns;
+                Data_Bus <= "001100101000100010101010";
+                -- -------------------------------------
+                -- -------------  Current Time:  406835ns
+                WAIT FOR 53900 ns;
+                Addr_Bus <= "1101";
+                -- -------------------------------------
+                -- -------------  Current Time:  421735ns
+                WAIT FOR 14900 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  430635ns
+                WAIT FOR 8900 ns;
+                WR <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  532335ns
+                WAIT FOR 101700 ns;
+                Enable <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  540635ns
+                WAIT FOR 8300 ns;
+                Data_Bus <= "010100000100001111010011";
+                -- -------------------------------------
+                -- -------------  Current Time:  597535ns
+                WAIT FOR 56900 ns;
+                Addr_Bus <= "1100";
+                -- -------------------------------------
+                -- -------------  Current Time:  610935ns
+                WAIT FOR 13400 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  619935ns
+                WAIT FOR 9000 ns;
+                WR <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  626835ns
+                WAIT FOR 6900 ns;
+                Enable <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  731735ns
+                WAIT FOR 104900 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  739135ns
+                WAIT FOR 7400 ns;
+                WR <= '0';
+                -- -------------------------------------
+                WAIT FOR 260965 ns;
+
+                STD.TEXTIO.write(TX_OUT, string'("Total[]"));
+                STD.TEXTIO.writeline(RESULTS, TX_OUT);
+                ASSERT (FALSE) REPORT
+                    "Success! Simulation for annotation completed"
+                    SEVERITY FAILURE;
+            END PROCESS;
+
+    END testbench_arch;
+

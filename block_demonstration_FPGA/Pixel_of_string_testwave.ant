@@ -1,0 +1,216 @@
+--------------------------------------------------------------------------------
+-- Copyright (c) 1995-2003 Xilinx, Inc.
+-- All Right Reserved.
+--------------------------------------------------------------------------------
+--   ____  ____ 
+--  /   /\/   / 
+-- /___/  \  /    Vendor: Xilinx 
+-- \   \   \/     Version : 10.1
+--  \   \         Application : ISE
+--  /   /         Filename : Pixel_of_string_testwave.ant
+-- /___/   /\     Timestamp : Tue Mar 26 21:35:58 2013
+-- \   \  /  \ 
+--  \___\/\___\ 
+--
+--Command: 
+--Design Name: Pixel_of_string_testwave
+--Device: Xilinx
+--
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+USE IEEE.STD_LOGIC_TEXTIO.ALL;
+USE STD.TEXTIO.ALL;
+
+ENTITY Pixel_of_string_testwave IS
+END Pixel_of_string_testwave;
+
+ARCHITECTURE testbench_arch OF Pixel_of_string_testwave IS
+    FILE RESULTS: TEXT OPEN WRITE_MODE IS "D:\STUDY\Diplom_LED_project\Diplom_LED\Pixel_of_string_testwave.ano";
+
+    COMPONENT Pixel_of_string
+        PORT (
+            CLK : In std_logic;
+            DataBus : In std_logic_vector (23 DownTo 0);
+            WR : In std_logic;
+            R : Out std_logic;
+            G : Out std_logic;
+            B : Out std_logic
+        );
+    END COMPONENT;
+
+    SIGNAL CLK : std_logic := '0';
+    SIGNAL DataBus : std_logic_vector (23 DownTo 0) := "000000000000000000000000";
+    SIGNAL WR : std_logic := '0';
+    SIGNAL R : std_logic := '0';
+    SIGNAL G : std_logic := '0';
+    SIGNAL B : std_logic := '0';
+
+    SHARED VARIABLE TX_ERROR : INTEGER := 0;
+    SHARED VARIABLE TX_OUT : LINE;
+
+    constant PERIOD : time := 200 ns;
+    constant DUTY_CYCLE : real := 0.5;
+    constant OFFSET : time := 100 ns;
+
+    BEGIN
+        UUT : Pixel_of_string
+        PORT MAP (
+            CLK => CLK,
+            DataBus => DataBus,
+            WR => WR,
+            R => R,
+            G => G,
+            B => B
+        );
+
+        PROCESS    -- clock process for CLK
+        BEGIN
+            WAIT for OFFSET;
+            CLOCK_LOOP : LOOP
+                CLK <= '0';
+                WAIT FOR (PERIOD - (PERIOD * DUTY_CYCLE));
+                CLK <= '1';
+                WAIT FOR (PERIOD * DUTY_CYCLE);
+            END LOOP CLOCK_LOOP;
+        END PROCESS;
+
+        PROCESS    -- Annotation process for CLK
+            VARIABLE TX_TIME : INTEGER := 0;
+
+            PROCEDURE ANNOTATE_R(
+                TX_TIME : INTEGER
+            ) IS
+                VARIABLE TX_STR : String(1 to 4096);
+                VARIABLE TX_LOC : LINE;
+            BEGIN
+                STD.TEXTIO.write(TX_LOC, string'("Annotate["));
+                STD.TEXTIO.write(TX_LOC, TX_TIME);
+                STD.TEXTIO.write(TX_LOC, string'(", R, "));
+                IEEE.STD_LOGIC_TEXTIO.write(TX_LOC, R);
+                STD.TEXTIO.write(TX_LOC, string'("]"));
+                TX_STR(TX_LOC.all'range) := TX_LOC.all;
+                STD.TEXTIO.writeline(RESULTS, TX_LOC);
+                STD.TEXTIO.Deallocate(TX_LOC);
+            END;
+            PROCEDURE ANNOTATE_G(
+                TX_TIME : INTEGER
+            ) IS
+                VARIABLE TX_STR : String(1 to 4096);
+                VARIABLE TX_LOC : LINE;
+            BEGIN
+                STD.TEXTIO.write(TX_LOC, string'("Annotate["));
+                STD.TEXTIO.write(TX_LOC, TX_TIME);
+                STD.TEXTIO.write(TX_LOC, string'(", G, "));
+                IEEE.STD_LOGIC_TEXTIO.write(TX_LOC, G);
+                STD.TEXTIO.write(TX_LOC, string'("]"));
+                TX_STR(TX_LOC.all'range) := TX_LOC.all;
+                STD.TEXTIO.writeline(RESULTS, TX_LOC);
+                STD.TEXTIO.Deallocate(TX_LOC);
+            END;
+            PROCEDURE ANNOTATE_B(
+                TX_TIME : INTEGER
+            ) IS
+                VARIABLE TX_STR : String(1 to 4096);
+                VARIABLE TX_LOC : LINE;
+            BEGIN
+                STD.TEXTIO.write(TX_LOC, string'("Annotate["));
+                STD.TEXTIO.write(TX_LOC, TX_TIME);
+                STD.TEXTIO.write(TX_LOC, string'(", B, "));
+                IEEE.STD_LOGIC_TEXTIO.write(TX_LOC, B);
+                STD.TEXTIO.write(TX_LOC, string'("]"));
+                TX_STR(TX_LOC.all'range) := TX_LOC.all;
+                STD.TEXTIO.writeline(RESULTS, TX_LOC);
+                STD.TEXTIO.Deallocate(TX_LOC);
+            END;
+        BEGIN
+            WAIT for 1 fs;
+            ANNOTATE_R(0);
+            ANNOTATE_G(0);
+            ANNOTATE_B(0);
+            WAIT for OFFSET;
+            TX_TIME := TX_TIME + 100;
+            ANNO_LOOP : LOOP
+                --Rising Edge
+                WAIT for 115 ns;
+                TX_TIME := TX_TIME + 115;
+                ANNOTATE_R(TX_TIME);
+                ANNOTATE_G(TX_TIME);
+                ANNOTATE_B(TX_TIME);
+                WAIT for 85 ns;
+                TX_TIME := TX_TIME + 85;
+            END LOOP ANNO_LOOP;
+        END PROCESS;
+
+        PROCESS
+            BEGIN
+                -- -------------  Current Time:  100ns
+                WAIT FOR 100 ns;
+                DataBus <= "111111111111111111111111";
+                -- -------------------------------------
+                -- -------------  Current Time:  185ns
+                WAIT FOR 85 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  385ns
+                WAIT FOR 200 ns;
+                WR <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  199785ns
+                WAIT FOR 199400 ns;
+                WR <= '1';
+                DataBus <= "001001010110100011011110";
+                -- -------------------------------------
+                -- -------------  Current Time:  199985ns
+                WAIT FOR 200 ns;
+                WR <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  499585ns
+                WAIT FOR 299600 ns;
+                DataBus <= "001011110100010110011001";
+                -- -------------------------------------
+                -- -------------  Current Time:  499785ns
+                WAIT FOR 200 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  499985ns
+                WAIT FOR 200 ns;
+                WR <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  699585ns
+                WAIT FOR 199600 ns;
+                DataBus <= "101001000011011000011001";
+                -- -------------------------------------
+                -- -------------  Current Time:  699785ns
+                WAIT FOR 200 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  699985ns
+                WAIT FOR 200 ns;
+                WR <= '0';
+                -- -------------------------------------
+                -- -------------  Current Time:  899585ns
+                WAIT FOR 199600 ns;
+                DataBus <= "000000000000000000000000";
+                -- -------------------------------------
+                -- -------------  Current Time:  899785ns
+                WAIT FOR 200 ns;
+                WR <= '1';
+                -- -------------------------------------
+                -- -------------  Current Time:  899985ns
+                WAIT FOR 200 ns;
+                WR <= '0';
+                -- -------------------------------------
+                WAIT FOR 100215 ns;
+
+                STD.TEXTIO.write(TX_OUT, string'("Total[]"));
+                STD.TEXTIO.writeline(RESULTS, TX_OUT);
+                ASSERT (FALSE) REPORT
+                    "Success! Simulation for annotation completed"
+                    SEVERITY FAILURE;
+            END PROCESS;
+
+    END testbench_arch;
+
